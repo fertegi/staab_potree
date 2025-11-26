@@ -1,0 +1,155 @@
+<html>
+
+<head>
+    <title>Staab - Punktwolkenviewer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #ffffff;
+            min-height: 100vh;
+            padding: 60px 20px;
+        }
+
+        .header {
+            max-width: 900px;
+            margin: 0 auto 60px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #000000;
+            font-size: 2.5em;
+            margin-bottom: 12px;
+            font-weight: 600;
+            letter-spacing: 0px;
+        }
+
+        p {
+            color: #666666;
+            font-size: 1.05em;
+            font-weight: 400;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .card {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 28px 32px;
+            border: 2px solid #000000;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card:hover {
+            transform: translateX(8px);
+            box-shadow: 8px 8px 0px #000000;
+        }
+
+        .card-content {
+            flex: 1;
+        }
+
+        .card h2 {
+            color: #000000;
+            font-size: 1.5em;
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+
+        .card p {
+            color: #666666;
+            font-size: 0.95em;
+            margin: 0;
+        }
+
+        .card a {
+            display: inline-block;
+            margin-left: 24px;
+            padding: 12px 28px;
+            background: #000000;
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 12px;
+            font-size: 0.95em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            border: 2px solid #000000;
+        }
+
+        .card a:hover {
+            background: #ffffff;
+            color: #000000;
+        }
+
+        @media (max-width: 768px) {
+            .card {
+                flex-direction: column;
+                text-align: center;
+                gap: 16px;
+            }
+
+            .card a {
+                margin-left: 0;
+                width: 100%;
+            }
+
+            h1 {
+                font-size: 1.8em;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <h1>Staab Punktwolkenviewer</h1>
+        <p>Anzeigen und Interaktion mit 3D-Punktwolken</p>
+    </div>
+
+    <div class="container" id="cardContainer"></div>
+
+    <script>
+        const pages = [
+            { name: 'RSH', file: './rsh.html', description: 'Punktwolke RSH' },
+            { name: 'SSW', file: './ssw.html', description: 'Punktwolke SSW' },
+            { name: 'SNE', file: './sne.html', description: 'Punktwolke SNE' },
+        ];
+
+        function loadPages() {
+            const container = document.getElementById('cardContainer');
+
+            pages.forEach(page => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
+                    <div class="card-content">
+                        <h2>${page.name}</h2>
+                        <p>${page.description}</p>
+                    </div>
+                    <a href="${page.file}">Öffnen</a>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        loadPages();
+    </script>
+</body>
+
+</html>
