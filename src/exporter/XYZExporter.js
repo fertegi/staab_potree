@@ -1,7 +1,13 @@
 export class XYZExporter {
+    //@fertegi - this export does not work with multiple point clouds yet
+
+    /**
+     * Converts the given points to an XYZ string.
+     * @param {Points} points The points to convert.
+     * @returns {string} The XYZ string.
+     */
     static toString(points) {
         let string = '';
-
         let attributes = Object.keys(points.data)
             .filter(a => a !== 'normal')
             .sort((a, b) => {
