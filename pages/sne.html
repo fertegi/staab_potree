@@ -61,20 +61,20 @@
 		viewer.setBackground("white");
 
 		// Terrain
-		Potree.loadPointCloud("../pointclouds/staab/SNE/data2/metadata.json", "", e => {
-			let scene = viewer.scene;
-			let pointcloud = e.pointcloud;
-			pointcloud.name = "Terrain"
-			let material = pointcloud.material;
-			material.size = 1;
-			material.pointSizeType = Potree.PointSizeType.ADAPTIVE;
-			material.shape = Potree.PointShape.CIRCLE;
-			material.activeAttributeName = "rgba";
+		// Potree.loadPointCloud("../pointclouds/staab/SNE/data2/metadata.json", "", e => {
+		// 	let scene = viewer.scene;
+		// 	let pointcloud = e.pointcloud;
+		// 	pointcloud.name = "Terrain"
+		// 	let material = pointcloud.material;
+		// 	material.size = 1;
+		// 	material.pointSizeType = Potree.PointSizeType.ADAPTIVE;
+		// 	material.shape = Potree.PointShape.CIRCLE;
+		// 	material.activeAttributeName = "rgba";
 
-			scene.addPointCloud(pointcloud);
-			viewer.fitToScreen();
+		// 	scene.addPointCloud(pointcloud);
+		// 	viewer.fitToScreen();
 
-		});
+		// });
 
 		// Pointcloud
 		/*Potree.loadPointCloud("../pointclouds/staab/SNE/data3/metadata.json", "", e => {
