@@ -92,8 +92,8 @@
 			viewer.fitToScreen();
 
 		}); */
-		
-				// Pointcloud
+
+		// Pointcloud
 		Potree.loadPointCloud("../pointclouds/staab/SNE/data4/metadata.json", "", e => {
 			let scene = viewer.scene;
 			let pointcloud = e.pointcloud;
@@ -107,7 +107,21 @@
 
 			scene.addPointCloud(pointcloud);
 			viewer.fitToScreen();
+		});
+		// Pointcloud
+		Potree.loadPointCloud("../pointclouds/staab/SNE/data5/metadata.json", "", e => {
+			let scene = viewer.scene;
+			let pointcloud = e.pointcloud;
+			pointcloud.name = "SNE - Neu"
 
+			let material = pointcloud.material;
+			material.size = 1;
+			material.pointSizeType = Potree.PointSizeType.ADAPTIVE;
+			material.shape = Potree.PointShape.CIRCLE;
+			material.activeAttributeName = "rgba";
+
+			scene.addPointCloud(pointcloud);
+			viewer.fitToScreen();
 		});
 
 
