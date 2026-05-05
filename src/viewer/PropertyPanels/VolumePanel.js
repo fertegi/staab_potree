@@ -3,6 +3,8 @@ import * as THREE from "../../../libs/three.js/build/three.module.js";
 import { Utils } from "../../utils.js";
 import { Volume, BoxVolume, SphereVolume } from "../../utils/Volume.js";
 import { XYZExporter } from "../../exporter/XYZExporter.js";
+import { Points } from "../../Points.js";
+import { VolumeRequest } from "../../VolumeRequest.js";
 
 import { MeasurePanel } from "./MeasurePanel.js";
 
@@ -154,8 +156,39 @@ export class VolumePanel extends MeasurePanel {
 
 		this.elContent.find("#volume_export_xyz").click(() => {
 			let volume = this.measurement;
-			console.log("exporting volume to xyz ...");
+			let pointclouds = this.viewer.scene.pointclouds;
 
+			if (pointclouds.length === 0) {
+				return;
+			}
+
+			let allPoints = new Points();
+			let pending = pointclouds.length;
+
+			for (let pointcloud of pointclouds) {
+				let request = new VolumeRequest(pointcloud, volume, {
+					onProgress: ({ points }) => {
+						allPoints.add(points);
+					},
+					onFinish: () => {
+						pending--;
+						if (pending === 0) {
+							let string = XYZExporter.toString(allPoints);
+							let blob = new Blob([string], { type: 'text/plain' });
+							let url = URL.createObjectURL(blob);
+							let a = document.createElement('a');
+							a.href = url;
+							a.download = 'volume_export.xyz';
+							a.click();
+							URL.revokeObjectURL(url);
+						}
+					},
+					onCancel: () => {
+						pending--;
+					},
+				});
+				pointcloud.profileRequests.push(request);
+			}
 		});
 
 

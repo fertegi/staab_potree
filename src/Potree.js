@@ -16,6 +16,7 @@ export * from "./Points.js";
 export * from "./Potree_update_visibility.js";
 export * from "./PotreeRenderer.js";
 export * from "./ProfileRequest.js";
+export * from "./VolumeRequest.js";
 export * from "./TextSprite.js";
 export * from "./utils.js";
 export * from "./Version.js";
