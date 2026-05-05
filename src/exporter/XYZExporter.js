@@ -1,5 +1,4 @@
 export class XYZExporter {
-    //@fertegi - this export does not work with multiple point clouds yet
 
     /**
      * Converts the given points to an XYZ string.
