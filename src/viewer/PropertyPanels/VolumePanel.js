@@ -99,21 +99,7 @@ export class VolumePanel extends MeasurePanel {
 					<input id="volume_make_uniform" type="button" value="make uniform"/>
 				</li>
 
-				<div style="margin-top: 10px; border-top: 1px solid #555; padding-top: 8px">
-					<div style="font-size: 11px; color: #aaa; margin-bottom: 4px">XYZ Export</div>
-					<table class="measurement_value_table" style="margin-bottom: 4px">
-						<tr><th>Offset X</th><th>Offset Y</th><th>Offset Z</th></tr>
-						<tr>
-							<td><input id="xyz_offset_x" type="number" value="0" step="any" style="width:100%"/></td>
-							<td><input id="xyz_offset_y" type="number" value="0" step="any" style="width:100%"/></td>
-							<td><input id="xyz_offset_z" type="number" value="0" step="any" style="width:100%"/></td>
-						</tr>
-					</table>
-					<div style="display:flex; align-items:center; gap:6px; margin-bottom:6px">
-						<span style="font-size:11px">Density:</span>
-						<input id="xyz_density" type="number" min="1" max="100" value="100" style="width:55px"/>
-						<span style="font-size:11px">%</span>
-					</div>
+				<div style="margin-top: 10px">
 					<input id="volume_export_xyz" type="button" value="Export Volume to XYZ" style="width:100%"/>
 					<div id="xyz_export_status" style="font-size:11px; color:#aaa; margin-top:4px; min-height:14px"></div>
 				</div>
@@ -184,10 +170,10 @@ export class VolumePanel extends MeasurePanel {
 			let elButton = this.elContent.find('#volume_export_xyz');
 			let elStatus = this.elContent.find('#xyz_export_status');
 
-			let ox = parseFloat(this.elContent.find('#xyz_offset_x').val()) || 0;
-			let oy = parseFloat(this.elContent.find('#xyz_offset_y').val()) || 0;
-			let oz = parseFloat(this.elContent.find('#xyz_offset_z').val()) || 0;
-			let density = Math.max(1, Math.min(100, parseFloat(this.elContent.find('#xyz_density').val()) || 100));
+			let ox = parseFloat($('#xyz_global_offset_x').val()) || 0;
+			let oy = parseFloat($('#xyz_global_offset_y').val()) || 0;
+			let oz = parseFloat($('#xyz_global_offset_z').val()) || 0;
+			let density = Math.max(1, Math.min(100, parseFloat($('#xyz_global_density').val()) || 100));
 
 			elButton.prop('disabled', true);
 			elStatus.text('Exporting\u2026 (may take a while for large datasets)');

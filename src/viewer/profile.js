@@ -548,9 +548,35 @@ export class ProfileWindow extends EventDispatcher {
 
 			const points = getProfilePoints();
 
-			const string = XYZExporter.toString(points, true);
+			let ox = parseFloat($('#xyz_global_offset_x').val()) || 0;
+			let oy = parseFloat($('#xyz_global_offset_y').val()) || 0;
+			let oz = parseFloat($('#xyz_global_offset_z').val()) || 0;
+			let density = Math.max(1, Math.min(100, parseFloat($('#xyz_global_density').val()) || 100));
 
-			const blob = new Blob([string], { type: "text/string" });
+			let exportPoints = points;
+			if (density < 100 && points.numPoints > 0) {
+				let ratio = density / 100;
+				let keep = [];
+				for (let i = 0; i < points.numPoints; i++) {
+					if (Math.random() < ratio) keep.push(i);
+				}
+				exportPoints = new Points();
+				for (let [attr, array] of Object.entries(points.data)) {
+					let elemSize = array.length / points.numPoints;
+					let filtered = new array.constructor(elemSize * keep.length);
+					for (let j = 0; j < keep.length; j++) {
+						let idx = keep[j];
+						filtered.set(array.subarray(idx * elemSize, (idx + 1) * elemSize), j * elemSize);
+					}
+					exportPoints.data[attr] = filtered;
+				}
+				exportPoints.numPoints = keep.length;
+			}
+
+			let offset = (ox !== 0 || oy !== 0 || oz !== 0) ? { x: ox, y: oy, z: oz } : null;
+			const string = XYZExporter.toString(exportPoints, offset);
+
+			const blob = new Blob([string], { type: "text/plain" });
 			$('#potree_download_profile_xyz_link').attr('href', URL.createObjectURL(blob));
 		});
 
