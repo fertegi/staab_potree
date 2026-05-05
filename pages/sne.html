@@ -38,7 +38,10 @@
 		<div id="potree_sidebar_container"> </div>
 	</div>
 
-	<script>
+	<script type="module">
+		import * as THREE from "../libs/three.js/build/three.module.js";
+		import { GLTFLoader } from "../libs/three.js/loaders/GLTFLoader.js";
+
 
 		window.viewer = new Potree.Viewer(document.getElementById("potree_render_area"));
 
@@ -108,6 +111,8 @@
 		// 	scene.addPointCloud(pointcloud);
 		// 	viewer.fitToScreen();
 		// });
+
+
 		// Pointcloud
 		Potree.loadPointCloud("../pointclouds/staab/SNE/data5/metadata.json", "", e => {
 			let scene = viewer.scene;
@@ -124,6 +129,34 @@
 			viewer.fitToScreen();
 		});
 
+		var loader = new GLTFLoader();
+
+		loader.load("PFAD ZUM MODELL", (gltf) => {
+			gltf.computeVertexNormals();
+		}, undefined, (error) => {
+			console.error(error);
+		});
+
+		let mesh;
+		{
+			let material = new THREE.MeshStandardMaterial({
+				color: 0x0055ff,
+				flatShading: true,
+				metalness: 0.2
+			})
+			mesh = new THREE.Mesh(geometry, material);
+			viewer.scene.scene.add(mesh);
+		}
+		{ // LIGHTS
+			const directional = new THREE.DirectionalLight(0xffffff, 1.0);
+			directional.position.set(10, 10, 10);
+			directional.lookAt(0, 0, 0);
+
+			const ambient = new THREE.AmbientLight(0x555555);
+
+			viewer.scene.scene.add(directional);
+			viewer.scene.scene.add(ambient);
+		}
 
 	</script>
 
