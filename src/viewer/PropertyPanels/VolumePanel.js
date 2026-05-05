@@ -98,7 +98,26 @@ export class VolumePanel extends MeasurePanel {
 					<input id="volume_reset_orientation" type="button" value="reset orientation"/>
 					<input id="volume_make_uniform" type="button" value="make uniform"/>
 				</li>
-				<input id="volume_export_xyz" type="button" value="Export Volume to XYZ" style="margin-top: 10px"/>
+
+				<div style="margin-top: 10px; border-top: 1px solid #555; padding-top: 8px">
+					<div style="font-size: 11px; color: #aaa; margin-bottom: 4px">XYZ Export</div>
+					<table class="measurement_value_table" style="margin-bottom: 4px">
+						<tr><th>Offset X</th><th>Offset Y</th><th>Offset Z</th></tr>
+						<tr>
+							<td><input id="xyz_offset_x" type="number" value="0" step="any" style="width:100%"/></td>
+							<td><input id="xyz_offset_y" type="number" value="0" step="any" style="width:100%"/></td>
+							<td><input id="xyz_offset_z" type="number" value="0" step="any" style="width:100%"/></td>
+						</tr>
+					</table>
+					<div style="display:flex; align-items:center; gap:6px; margin-bottom:6px">
+						<span style="font-size:11px">Density:</span>
+						<input id="xyz_density" type="number" min="1" max="100" value="100" style="width:55px"/>
+						<span style="font-size:11px">%</span>
+					</div>
+					<input id="volume_export_xyz" type="button" value="Export Volume to XYZ" style="width:100%"/>
+					<div id="xyz_export_status" style="font-size:11px; color:#aaa; margin-top:4px; min-height:14px"></div>
+				</div>
+
 				<div style="display: flex; margin-top: 12px">
 					<span></span>
 					<span style="flex-grow: 1"></span>
@@ -162,30 +181,68 @@ export class VolumePanel extends MeasurePanel {
 				return;
 			}
 
+			let elButton = this.elContent.find('#volume_export_xyz');
+			let elStatus = this.elContent.find('#xyz_export_status');
+
+			let ox = parseFloat(this.elContent.find('#xyz_offset_x').val()) || 0;
+			let oy = parseFloat(this.elContent.find('#xyz_offset_y').val()) || 0;
+			let oz = parseFloat(this.elContent.find('#xyz_offset_z').val()) || 0;
+			let density = Math.max(1, Math.min(100, parseFloat(this.elContent.find('#xyz_density').val()) || 100));
+
+			elButton.prop('disabled', true);
+			elStatus.text('Exporting\u2026 (may take a while for large datasets)');
+
 			let allPoints = new Points();
 			let pending = pointclouds.length;
+
+			let finish = () => {
+				pending--;
+				if (pending > 0) {
+					return;
+				}
+
+				// decimation
+				let exportPoints = allPoints;
+				if (density < 100 && allPoints.numPoints > 0) {
+					let ratio = density / 100;
+					let keep = [];
+					for (let i = 0; i < allPoints.numPoints; i++) {
+						if (Math.random() < ratio) keep.push(i);
+					}
+					exportPoints = new Points();
+					for (let [attr, array] of Object.entries(allPoints.data)) {
+						let elemSize = array.length / allPoints.numPoints;
+						let filtered = new array.constructor(elemSize * keep.length);
+						for (let j = 0; j < keep.length; j++) {
+							let idx = keep[j];
+							filtered.set(array.subarray(idx * elemSize, (idx + 1) * elemSize), j * elemSize);
+						}
+						exportPoints.data[attr] = filtered;
+					}
+					exportPoints.numPoints = keep.length;
+				}
+
+				let offset = (ox !== 0 || oy !== 0 || oz !== 0) ? { x: ox, y: oy, z: oz } : null;
+				let string = XYZExporter.toString(exportPoints, offset);
+				let blob = new Blob([string], { type: 'text/plain' });
+				let url = URL.createObjectURL(blob);
+				let a = document.createElement('a');
+				a.href = url;
+				a.download = 'volume_export.xyz';
+				a.click();
+				URL.revokeObjectURL(url);
+
+				elButton.prop('disabled', false);
+				elStatus.text(`Done \u2014 ${exportPoints.numPoints.toLocaleString()} points exported.`);
+			};
 
 			for (let pointcloud of pointclouds) {
 				let request = new VolumeRequest(pointcloud, volume, {
 					onProgress: ({ points }) => {
 						allPoints.add(points);
 					},
-					onFinish: () => {
-						pending--;
-						if (pending === 0) {
-							let string = XYZExporter.toString(allPoints);
-							let blob = new Blob([string], { type: 'text/plain' });
-							let url = URL.createObjectURL(blob);
-							let a = document.createElement('a');
-							a.href = url;
-							a.download = 'volume_export.xyz';
-							a.click();
-							URL.revokeObjectURL(url);
-						}
-					},
-					onCancel: () => {
-						pending--;
-					},
+					onFinish: finish,
+					onCancel: finish,
 				});
 				pointcloud.profileRequests.push(request);
 			}
